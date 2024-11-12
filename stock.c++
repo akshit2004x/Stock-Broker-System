@@ -23,6 +23,36 @@ class Transaction
             brokerCharge = charge;
         }
 };
+class User 
+{
+    private:
+
+        int userId;
+        string username;
+        UserCategory usercat;
+        double balance;
+        map<int,double> Stock_holds;
+        vector<Transaction> transactions;
+
+    public:
+
+        User()
+        {
+            userId = 0;
+            username = "";
+            usercat = UserCategory::INDIVIDUAL;
+            balance = 0.0;
+        }
+        User(int id,string name,UserCategory ucat, double bal)
+        {
+            userId = id;
+            username = name;
+            usercat = ucat;
+            balance = bal;
+            
+        }
+        
+};
 
 int main()
 {

@@ -3,7 +3,7 @@
 - **A C++ program that models a stock brokerage system where users can perform buy/sell transactions.**
 - **I am Attaching a PDF FILE for Functionalities.**
 
-# How to Run
+## How to Run
 
 You can run this C++ program using the following methods:
 

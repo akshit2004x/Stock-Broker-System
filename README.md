@@ -3,7 +3,7 @@
 - **A C++ program that models a stock brokerage system where users can perform buy/sell transactions.**
 - **I am Attaching a PDF FILE for Functionalities.**
 
-## How to Run
+# How to Run
 
 You can run this C++ program using the following methods:
 
@@ -18,7 +18,6 @@ You can run this C++ program using the following methods:
     g++ filename.cpp -o outputname
     ./outputname  # or outputname.exe on Windows
     ```
-  Replace `filename.cpp` with your file name.
 
 ### 2. Running Online
 

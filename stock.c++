@@ -53,30 +53,78 @@ class User
         }
         
 };
-class stock
+class Stock 
 {
     private:
-
         int stockId;
         double price;
+        double brokerage;
+        int quantity;
 
     public:
-
         Stock()
         {
             stockId = 0;
             price = 0.0;
+            brokerage = 0.0;
+            quantity = 0;
         }
-        Stock(int id, double p)
+        Stock(int id, double p,int broker,int qua)
         {
             stockId = id;
-            price = p;;
+            price = p;
+            brokerage = broker;
+            quantity = qua;
         }
-        double getPrice()  
-        {   
-            return price; 
-        }
+        
 };
+class StockBroker 
+{
+    private:
+        double broker_rate;
+        map<int, User> users;  
+        map<int, Stock> stocks; 
+
+    public:
+
+        StockBroker(double bob)
+        {
+            broker_rate = bob;
+        }
+    
+        bool registerUser(int userId,string name, UserCategory type, double balance = 0.0) 
+        {
+            if(users.find(userId) != users.end()) 
+                return false;
+            else
+            {
+                users[userId] = User(userId,name,type,balance);
+                return true; 
+            }
+        }
+        bool unregisterUser(int userId) 
+        {
+            return users.erase(userId); 
+        }
+        bool registerStock(int stockId, double price,int brok,int quan) 
+        {
+            if(stocks.find(stockId) != stocks.end())
+            {
+                return false;
+            }
+            else
+            {
+                stocks[stockId] = Stock(stockId, price,brok,quan);
+                return true;
+            }
+        }
+        bool unregisterStock(int stockId) 
+        {
+            return stocks.erase(stockId);
+        }
+        
+};
+
 
 int main()
 {

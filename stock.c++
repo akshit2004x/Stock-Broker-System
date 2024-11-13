@@ -53,6 +53,30 @@ class User
         }
         
 };
+class stock
+{
+    private:
+
+        int stockId;
+        double price;
+
+    public:
+
+        Stock()
+        {
+            stockId = 0;
+            price = 0.0;
+        }
+        Stock(int id, double p)
+        {
+            stockId = id;
+            price = p;;
+        }
+        double getPrice()  
+        {   
+            return price; 
+        }
+};
 
 int main()
 {

@@ -51,6 +51,51 @@ class User
             balance = bal;
             
         }
+        bool deductAmount(double amount) 
+        {
+            if (balance >= amount) 
+            {
+                balance = balance - amount;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        void addAmount(double amount) 
+        {  
+            balance = balance + amount;
+        }
+        bool updateStock_holds(int stockId, double quantity, bool isBuy) 
+        {
+            if(isBuy) 
+            {
+                Stock_holds[stockId] = Stock_holds[stockId] + quantity;  
+                return true;
+            } 
+            else 
+            {   
+                if(Stock_holds[stockId] >= quantity) 
+                {
+                    Stock_holds[stockId] = Stock_holds[stockId] - quantity;  
+                    return true;
+                }
+                return false;  
+            }
+        }
+        void addTransaction(Transaction trans)
+        {
+            transactions.push_back(trans);
+        }
+        vector<Transaction> getTransactions() 
+        { 
+            return transactions;
+        }
+        double getBalance() 
+        {  
+            return balance;
+        }
         
 };
 class Stock 
@@ -75,6 +120,32 @@ class Stock
             price = p;
             brokerage = broker;
             quantity = qua;
+        }
+        double getPrice()  
+        {   
+            return price; 
+        }
+
+        double getbrokerage()
+        {
+            return brokerage;
+        }
+
+        bool deductstock(int preq)
+        {
+            if(quantity >= preq)
+            {
+                quantity = quantity - preq;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        void addstock(int qa)
+        {
+            quantity = quantity + qa;
         }
         
 };
@@ -122,6 +193,29 @@ class StockBroker
         {
             return stocks.erase(stockId);
         }
+        bool buyStock(int userId, int stockId, double quantity) 
+        {
+            if (users.find(userId) == users.end() || stocks.find(stockId) == stocks.end() || quantity <= 0) 
+                return false; 
+
+            User& uobj = users[userId];      
+            Stock& sobj = stocks[stockId];  
+
+            
+            double totalCost = sobj.getPrice() * quantity;
+            double brokerage = (totalCost * sobj.getbrokerage()) / 100.0;
+            double totalAmount = totalCost + brokerage;
+
+           if(sobj.deductstock(quantity) && uobj.deductAmount(totalAmount)) {
+            uobj.updateStock_holds(stockId, quantity, true);
+            uobj.addTransaction(Transaction(stockId, true, quantity, sobj.getPrice(), brokerage));
+            cout << "Transaction successful. Total cost: " << totalAmount << endl;
+            return true;
+            }
+            return false;
+        }
+
+        
         
 };
 

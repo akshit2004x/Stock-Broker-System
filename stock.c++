@@ -152,17 +152,11 @@ class Stock
 class StockBroker 
 {
     private:
-        double broker_rate;
+        double broker_rate = 1;
         map<int, User> users;  
         map<int, Stock> stocks; 
 
     public:
-
-        StockBroker(double bob)
-        {
-            broker_rate = bob;
-        }
-    
         bool registerUser(int userId,string name, UserCategory type, double balance = 0.0) 
         {
             if(users.find(userId) != users.end()) 
@@ -214,13 +208,46 @@ class StockBroker
             }
             return false;
         }
+        bool sellStock(int userId, int stockId, double quantity) 
+        {
+            if (users.find(userId) == users.end() || stocks.find(stockId) == stocks.end() || quantity <= 0)
+            return false;
 
-        
+            User& uobj = users[userId];
+            Stock& sobj = stocks[stockId];
+
+            if (uobj.updateStock_holds(stockId, quantity, false)) 
+            {
+                double totalIncome = sobj.getPrice() * quantity;
+                double brokerage = (totalIncome * sobj.getbrokerage()) / 100.0;
+                double netIncome = totalIncome - brokerage;
+
+                sobj.addstock(quantity);
+                uobj.addAmount(netIncome);
+                uobj.addTransaction(Transaction(stockId, false, quantity,sobj.getPrice(), brokerage));
+                cout << "Stock sold. Net income: " << netIncome << endl;
+                return true;
+            }
+            return false;
+        }
+        double balanceleft(int userId)
+        {
+            if (users.find(userId) == users.end()) return 0.0; 
+
+            return users[userId].getBalance();
+        }
         
 };
 
 
 int main()
 {
+    StockBroker Broker_1;
+    Broker_1.registerUser(1, "Akshit", UserCategory::INDIVIDUAL, 10000.0);
+    Broker_1.registerStock(101, 100.0, 1, 50);
+    Broker_1.buyStock(1, 101, 10);
+    Broker_1.sellStock(1, 101, 5);
+    cout<<"The balance left is:"<<Broker_1.balanceleft(1);
+
     return 0;
 }

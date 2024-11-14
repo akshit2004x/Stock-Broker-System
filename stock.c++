@@ -236,10 +236,16 @@ class StockBroker
 
             return users[userId].getBalance();
         }
-        
+        double getBrokerageCharges(int userId) 
+        {   
+            double total = 0.0;
+            for (auto trans : users[userId].getTransactions()) 
+            {
+                total = total + trans.brokerCharge; 
+            }
+            return total;
+        }
 };
-
-
 int main()
 {
     StockBroker Broker_1;

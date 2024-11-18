@@ -31,10 +31,9 @@ class User
         string username;
         UserCategory usercat;
         double balance;
-        map<int,double> Stock_holds;
-        vector<Transaction> transactions;
-
     public:
+        vector<Transaction> transactions;
+        map<int,double> Stock_holds;
 
         User()
         {
@@ -49,7 +48,6 @@ class User
             username = name;
             usercat = ucat;
             balance = bal;
-            
         }
         bool deductAmount(double amount) 
         {
@@ -206,11 +204,13 @@ class StockBroker
             double brokerage = (totalCost * brok) / 100.0;
             double totalAmount = totalCost + brokerage;
 
-           if(sobj.deductstock(quantity) && uobj.deductAmount(totalAmount)) {
-            uobj.updateStock_holds(stockId, quantity, true);
-            uobj.addTransaction(Transaction(stockId, true, quantity, sobj.getPrice(), brokerage));
-            cout << "Transaction successful. Total cost: " << totalAmount << endl;
-            return true;
+            if(sobj.deductstock(quantity) && uobj.deductAmount(totalAmount)) 
+            {
+                uobj.updateStock_holds(stockId, quantity, true);
+                uobj.addTransaction(Transaction(stockId, true, quantity, sobj.getPrice(), brokerage));
+                cout<<"PURCHASING STOCK IS SUCCESSFUL"<<endl;
+                cout << "Transaction successful , Total cost: " << totalAmount << endl;
+                return true;
             }
             return false;
         }
@@ -238,7 +238,8 @@ class StockBroker
                 sobj.addstock(quantity);
                 uobj.addAmount(netIncome);
                 uobj.addTransaction(Transaction(stockId, false, quantity,sobj.getPrice(), brokerage));
-                cout << "Stock sold. Net income: " << netIncome << endl;
+                cout<<"SELLING STOCK IS SUCCESSFUL"<<endl;
+                cout <<"Transaction successful , Net income: " << netIncome << endl;
                 return true;
             }
             return false;
@@ -258,15 +259,77 @@ class StockBroker
             }
             return total;
         }
+        void Display_stock_holds(int userId)
+        {
+            cout<<"STOCKS THE USER IS HOLDING"<<endl;
+            for(auto i:users[userId].Stock_holds)
+            {
+                cout<<i.first<<" - "<<i.second<<endl;
+            }
+        }
+        void Transaction_history_retrieval(int userId)
+        {
+            cout<<"TRANSACTIONS DONE TILL NOW"<<endl<<endl;
+
+            for (auto transaction : users[userId].getTransactions())
+            {
+                
+                cout << "Stock ID :" << transaction.stockId << endl;
+                cout << "Transaction Type : " << (transaction.isBuy ? "Buy" : "Sell") << endl;
+                cout << "Quantity : " << transaction.quantity << endl;
+                cout << "Price : " << transaction.price << endl;
+                cout << "Broker Charge : " << transaction.brokerCharge << endl;
+                cout<<endl<<endl;
+            }
+
+        }
 };
 int main()
 {
     StockBroker Broker_1;
-    Broker_1.registerUser(1, "Akshit", UserCategory::INDIVIDUAL, 10000.0);
-    Broker_1.registerStock(101, 100.0, 1, 50);
-    Broker_1.buyStock(1, 101, 10);
-    Broker_1.sellStock(1, 101, 5);
-    cout<<"The balance left is:"<<Broker_1.balanceleft(1);
+    
+    // Must have Functionalities 
 
+        // REGISTER USER
+            Broker_1.registerUser(1,"Akshit",UserCategory::INDIVIDUAL,10000.0);
+            Broker_1.registerUser(2,"Pratham",UserCategory::INDIVIDUAL,10000.0);
+            Broker_1.registerUser(3,"Nishkarsh",UserCategory::INDIVIDUAL,10000.0);
+            Broker_1.registerUser(4,"Shlok",UserCategory::INDIVIDUAL,10000.0);
+
+        // REGISTER STOCK
+            Broker_1.registerStock(101,100.0,0.5,50);
+            Broker_1.registerStock(102,200.0,1,70);
+            Broker_1.registerStock(103,1000.0,5,30);
+            Broker_1.registerStock(104,400.0,2,100);
+
+        // UNREGISTER USER
+            Broker_1.unregisterUser(2);
+
+        // UNREGISTER STOCK
+            Broker_1.unregisterStock(103);
+            
+        // BUY STOCK
+            Broker_1.buyStock(1,101,8);
+            Broker_1.buyStock(1,102,10);
+            Broker_1.buyStock(1,104,2);
+
+        // SELL STOCK
+            Broker_1.sellStock(1, 101, 5);
+        
+        // STOCK UPHOLDS
+            cout<<endl;
+            Broker_1.Display_stock_holds(1);
+
+
+    // NICE TO HAVE FUNCTIONALITIES
+    
+        // Transaction History Retrieval
+        Broker_1.Transaction_history_retrieval(1);
+
+        // Balance Inquiry
+        Broker_1.getBrokerageCharges(1);
+
+        //
+        
     return 0;
 }

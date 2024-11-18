@@ -195,9 +195,15 @@ class StockBroker
             User& uobj = users[userId];      
             Stock& sobj = stocks[stockId];  
 
+            double brok = sobj.getbrokerage();
+
+            if( brok <= broker_rate)
+            {
+                brok = broker_rate;
+            }
             
             double totalCost = sobj.getPrice() * quantity;
-            double brokerage = (totalCost * sobj.getbrokerage()) / 100.0;
+            double brokerage = (totalCost * brok) / 100.0;
             double totalAmount = totalCost + brokerage;
 
            if(sobj.deductstock(quantity) && uobj.deductAmount(totalAmount)) {
@@ -218,8 +224,15 @@ class StockBroker
 
             if (uobj.updateStock_holds(stockId, quantity, false)) 
             {
+                double brok = sobj.getbrokerage();
+
+                if( brok <= broker_rate)
+                {
+                    brok = broker_rate;
+                }
+
                 double totalIncome = sobj.getPrice() * quantity;
-                double brokerage = (totalIncome * sobj.getbrokerage()) / 100.0;
+                double brokerage = (totalIncome * brok) / 100.0;
                 double netIncome = totalIncome - brokerage;
 
                 sobj.addstock(quantity);

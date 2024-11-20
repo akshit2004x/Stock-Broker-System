@@ -31,9 +31,9 @@ class User
 
         int userId;
         string username;
-        UserCategory usercat;
         double balance;
     public:
+        UserCategory usercat;
         vector<Transaction> transactions;
         map<int,double> Stock_holds;
 
@@ -51,8 +51,26 @@ class User
             usercat = ucat;
             balance = bal;
         }
+        string getName()
+        {
+            return username;
+        }
+        double getBalance() 
+        {  
+            return balance;
+        }
+        UserCategory getUserCategory()  
+        {
+            return usercat;
+        }
         bool deductAmount(double amount) 
         {
+            //balance notification
+            if(amount < 100)
+            {
+                cout<<"DEAR USER YOUR BALANCE IS QUITE LOW PLEASE DEPOSIT"<<endl;
+            }
+            
             if (balance >= amount) 
             {
                 balance = balance - amount;
@@ -92,10 +110,7 @@ class User
         {   
             return transactions;
         }
-        double getBalance() 
-        {  
-            return balance;
-        }
+        
         
 };
 class Stock 
@@ -121,15 +136,30 @@ class Stock
             brokerage = broker;
             quantity = qua;
         }
+
         double getPrice()  
         {   
             return price; 
         }
+        void setPrice(double np)
+        {
+            price = np;
+        }
+        double getquantity()
+        {
+            return quantity;
+        }
+        void setquantity(int a)
+        {
+            quantity = a; 
+        }
+
 
         double getbrokerage(double d=1.0)
         {
             return brokerage.value_or(d);;
         }
+
 
         bool deductstock(int preq)
         {
@@ -232,6 +262,13 @@ class StockBroker
             }
             return false;
         }
+        bool update_stock_price(int stockId,int new_price,int new_quantity)
+        {
+            Stock& sobj = stocks[stockId];
+
+            sobj.setPrice(new_price);
+            sobj.setquantity(new_quantity);
+        }
         double balanceleft(int userId)
         {
             if(users.find(userId) == users.end()) return 0.0; 
@@ -270,6 +307,46 @@ class StockBroker
             }
 
         }
+        void display_all_stock()
+        {
+            for(auto i:stocks)
+            {
+                cout<<"Stock No = "<<i.first<<" , Price - "<<i.second.getPrice()<<" ,Quantity = "<<i.second.getquantity()<<endl;
+            }
+        }
+
+        void display_all_user()
+        {
+            for(auto i:users)
+            {
+                cout<<"User No = "<<i.first<<" , User Name ="<<i.second.getName()<<" , User Balance = "<<i.second.getBalance()<<endl;
+            }
+        }
+
+        void display_particular_stock(int stockId)
+        {
+            if (stocks.find(stockId) == stocks.end()) 
+            {
+                cout << "Stock ID " << stockId << " not found." << endl;
+                return;
+            }
+
+            Stock& stock = stocks[stockId];
+            cout<<"Stock ID: "<<stockId<<", Price: "<<stock.getPrice()<<", Quantity: "<<stock.getquantity()<<", Brokerage: "<<stock.getbrokerage()<<"%"<< endl;
+        }
+
+        void display_particular_user(int userId)
+        {
+            if(users.find(userId) == users.end()) 
+            {
+                cout << "User ID " << userId << " not found." << endl;
+                return;
+            }
+
+            User& user = users[userId];
+            cout<<"User ID: "<<userId<< ", Name: "<<user.getName()<<", Balance: "<<user.getBalance()<<", User Category: "<<(user.getUserCategory() == UserCategory::INDIVIDUAL ? "INDIVIDUAL" : "INSTITUTION")<<" ,User Balance = "<<user.getBalance()<<endl; 
+        }   
+
 };
 int main()
 {
@@ -314,9 +391,30 @@ int main()
         Broker_1.Transaction_history_retrieval(1);
 
         // Balance Inquiry
+        Broker_1.balanceleft(1);
+
+        // Brokerage charge
         cout<<Broker_1.getBrokerageCharges(1);
 
-        //
         
+        //display all stock
+        Broker_1.display_all_stock();
+
+
+        //display all users
+        Broker_1.display_all_user();
+
+
+        // Display a particular Stock info
+        Broker_1.display_particular_stock(101);
+
+        //Display a particular user info
+        Broker_1.display_particular_user(1);
+
+
+        //Balance notification      
+
+
+
     return 0;
 }

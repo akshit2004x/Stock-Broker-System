@@ -1,4 +1,6 @@
 #include<bits/stdc++.h>
+#include<optional>
+
 using namespace std;
 enum class UserCategory
 {
@@ -86,8 +88,8 @@ class User
         {
             transactions.push_back(trans);
         }
-        vector<Transaction> getTransactions() 
-        { 
+        const vector<Transaction>& getTransactions() const 
+        {   
             return transactions;
         }
         double getBalance() 
@@ -101,7 +103,7 @@ class Stock
     private:
         int stockId;
         double price;
-        double brokerage;
+        optional<double> brokerage;
         int quantity;
 
     public:
@@ -112,7 +114,7 @@ class Stock
             brokerage = 0.0;
             quantity = 0;
         }
-        Stock(int id, double p,int broker,int qua)
+        Stock(int id, double p,optional<double> broker,int qua)
         {
             stockId = id;
             price = p;
@@ -124,9 +126,9 @@ class Stock
             return price; 
         }
 
-        double getbrokerage()
+        double getbrokerage(double d=1.0)
         {
-            return brokerage;
+            return brokerage.value_or(d);;
         }
 
         bool deductstock(int preq)
@@ -169,7 +171,7 @@ class StockBroker
         {
             return users.erase(userId); 
         }
-        bool registerStock(int stockId, double price,int brok,int quan) 
+        bool registerStock(int stockId, double price,optional<double> brok,int quan) 
         {
             if(stocks.find(stockId) != stocks.end())
             {
@@ -187,21 +189,14 @@ class StockBroker
         }
         bool buyStock(int userId, int stockId, double quantity) 
         {
-            if (users.find(userId) == users.end() || stocks.find(stockId) == stocks.end() || quantity <= 0) 
+            if(users.find(userId) == users.end() || stocks.find(stockId) == stocks.end() || quantity <= 0) 
                 return false; 
 
             User& uobj = users[userId];      
             Stock& sobj = stocks[stockId];  
-
-            double brok = sobj.getbrokerage();
-
-            if( brok <= broker_rate)
-            {
-                brok = broker_rate;
-            }
             
             double totalCost = sobj.getPrice() * quantity;
-            double brokerage = (totalCost * brok) / 100.0;
+            double brokerage = (totalCost * sobj.getbrokerage()) / 100.0;
             double totalAmount = totalCost + brokerage;
 
             if(sobj.deductstock(quantity) && uobj.deductAmount(totalAmount)) 
@@ -224,15 +219,8 @@ class StockBroker
 
             if (uobj.updateStock_holds(stockId, quantity, false)) 
             {
-                double brok = sobj.getbrokerage();
-
-                if( brok <= broker_rate)
-                {
-                    brok = broker_rate;
-                }
-
                 double totalIncome = sobj.getPrice() * quantity;
-                double brokerage = (totalIncome * brok) / 100.0;
+                double brokerage = (totalIncome * sobj.getbrokerage()) / 100.0;
                 double netIncome = totalIncome - brokerage;
 
                 sobj.addstock(quantity);
@@ -246,14 +234,14 @@ class StockBroker
         }
         double balanceleft(int userId)
         {
-            if (users.find(userId) == users.end()) return 0.0; 
+            if(users.find(userId) == users.end()) return 0.0; 
 
             return users[userId].getBalance();
         }
         double getBrokerageCharges(int userId) 
         {   
             double total = 0.0;
-            for (auto trans : users[userId].getTransactions()) 
+            for (const auto& trans : users[userId].getTransactions()) 
             {
                 total = total + trans.brokerCharge; 
             }
@@ -262,7 +250,7 @@ class StockBroker
         void Display_stock_holds(int userId)
         {
             cout<<"STOCKS THE USER IS HOLDING"<<endl;
-            for(auto i:users[userId].Stock_holds)
+            for(const auto& i:users[userId].Stock_holds)
             {
                 cout<<i.first<<" - "<<i.second<<endl;
             }
@@ -270,8 +258,7 @@ class StockBroker
         void Transaction_history_retrieval(int userId)
         {
             cout<<"TRANSACTIONS DONE TILL NOW"<<endl<<endl;
-
-            for (auto transaction : users[userId].getTransactions())
+            for(const auto& transaction : users[userId].getTransactions())
             {
                 
                 cout << "Stock ID :" << transaction.stockId << endl;
@@ -297,18 +284,18 @@ int main()
             Broker_1.registerUser(4,"Shlok",UserCategory::INDIVIDUAL,10000.0);
 
         // REGISTER STOCK
-            Broker_1.registerStock(101,100.0,0.5,50);
+            Broker_1.registerStock(101,100.0,nullopt,50);
             Broker_1.registerStock(102,200.0,1,70);
             Broker_1.registerStock(103,1000.0,5,30);
             Broker_1.registerStock(104,400.0,2,100);
 
-        // UNREGISTER USER
+        //  UNREGISTER USER
             Broker_1.unregisterUser(2);
 
-        // UNREGISTER STOCK
+        //  UNREGISTER STOCK
             Broker_1.unregisterStock(103);
             
-        // BUY STOCK
+        //  BUY STOCK
             Broker_1.buyStock(1,101,8);
             Broker_1.buyStock(1,102,10);
             Broker_1.buyStock(1,104,2);
@@ -316,18 +303,18 @@ int main()
         // SELL STOCK
             Broker_1.sellStock(1, 101, 5);
         
-        // STOCK UPHOLDS
+        //  STOCK UPHOLDS
             cout<<endl;
             Broker_1.Display_stock_holds(1);
 
 
-    // NICE TO HAVE FUNCTIONALITIES
+        // NICE TO HAVE FUNCTIONALITIES
     
         // Transaction History Retrieval
         Broker_1.Transaction_history_retrieval(1);
 
         // Balance Inquiry
-        Broker_1.getBrokerageCharges(1);
+        cout<<Broker_1.getBrokerageCharges(1);
 
         //
         

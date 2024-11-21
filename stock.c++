@@ -1,6 +1,5 @@
 #include<bits/stdc++.h>
 #include<optional>
-
 using namespace std;
 enum class UserCategory
 {
@@ -28,7 +27,6 @@ class Transaction
 class User 
 {
     private:
-
         int userId;
         string username;
         double balance;
@@ -51,6 +49,7 @@ class User
             usercat = ucat;
             balance = bal;
         }
+
         string getName()
         {
             return username;
@@ -63,14 +62,15 @@ class User
         {
             return usercat;
         }
+
         bool deductAmount(double amount) 
         {
             //balance notification
-            if(amount < 100)
+            if(amount <= 100)
             {
                 cout<<"DEAR USER YOUR BALANCE IS QUITE LOW PLEASE DEPOSIT"<<endl;
             }
-            
+
             if (balance >= amount) 
             {
                 balance = balance - amount;
@@ -106,7 +106,7 @@ class User
         {
             transactions.push_back(trans);
         }
-        const vector<Transaction>& getTransactions() const 
+        const vector<Transaction>& getTransactions() 
         {   
             return transactions;
         }
@@ -145,6 +145,7 @@ class Stock
         {
             price = np;
         }
+
         double getquantity()
         {
             return quantity;
@@ -153,7 +154,6 @@ class Stock
         {
             quantity = a; 
         }
-
 
         double getbrokerage(double d=1.0)
         {
@@ -182,7 +182,7 @@ class Stock
 class StockBroker 
 {
     private:
-        double broker_rate = 1;
+        double broker_rate = 1.0;
         map<int, User> users;  
         map<int, Stock> stocks; 
 
@@ -366,6 +366,163 @@ int main()
             Broker_1.registerStock(103,1000.0,5,30);
             Broker_1.registerStock(104,400.0,2,100);
 
+
+
+
+        while (true) 
+        {
+            cout<<endl;
+            cout<<"--- Stock Management System ---"<<endl;
+            cout<<"1. Register User"<<endl;
+            cout<<"2. Register Stock"<<endl;
+            cout<<"3. Unregister User"<<endl;
+            cout<<"4. Unregister Stock"<<endl;
+            cout<<"5. Buy Stock"<<endl;
+            cout<<"6. Sell Stock"<<endl;
+            cout<<"7. Update Stock"<<endl;
+            cout<<"8. Transaction History of a particular User"<<endl;
+            cout<<"9. Remaining Balance of a particular User"<<endl;
+            cout<<"10. Total Brokerage Charges given by a particular User"<<endl;
+            cout<<"11. Display All Stocks Listed"<<endl;
+            cout<<"12. Display All Users Listed"<<endl;
+            cout<<"13. Exit"<<endl;
+
+        int ch;
+        cout << "Enter a No to choose: ";
+        cin >> ch;
+
+        switch (ch) 
+        {
+            case 1:
+            {
+                int id;
+                cout << "Enter User ID: ";
+                cin >> id;
+
+                string uname;
+                cout << "Enter Username: ";
+                cin >> uname;
+
+                int category;
+                cout << "Enter User Category (0 for INDIVIDUAL, 1 for INSTITUTION): ";
+                cin >> category;
+
+                double balance;
+                cout << "Enter Initial Balance: ";
+                cin >> balance;
+
+                UserCategory userCategory = (category == 1) ? UserCategory::INSTITUTION : UserCategory::INDIVIDUAL;
+
+                if(Broker_1.registerUser(id, uname, userCategory, balance)) 
+                {
+                    cout << "User registered successfully.\n";
+                } 
+                else 
+                {
+                    cout << "User registration failed. ID might already exist.\n";
+                }
+                break;
+            }
+            case 2:
+            {
+                cout << "Registering Stock...\n";
+                int stockId, quantity;
+                double price;
+                optional<double> brokerage;
+                double brokerRate;
+
+                cout << "Enter Stock ID: ";
+                cin >> stockId;
+                cout << "Enter Stock Price: ";
+                cin >> price;
+                cout << "Enter Stock Quantity: ";
+                cin >> quantity;
+
+                cout << "Enter Brokerage Percentage (Enter -1 for no brokerage): ";
+                cin >> brokerRate;
+                if (brokerRate == -1) 
+                    brokerage = nullopt;
+                else 
+                    brokerage = brokerRate;
+
+                if (Broker_1.registerStock(stockId, price, brokerage, quantity)) {
+                    cout << "Stock registered successfully.\n";
+                } else {
+                    cout << "Failed to register stock. Stock ID might already exist.\n";
+                }
+                break;
+            }
+                
+            case 3:
+            {
+                cout<<"Unregistering User"<<endl;
+                int userId;
+                cout<<"Enter User ID to unregister: ";
+                cin>>userId;
+
+                if(Broker_1.unregisterUser(userId)) 
+                {
+                    cout << "User unregistered successfully.\n";
+                } 
+                else 
+                {
+                    cout << "Failed to unregister user. User ID may not exist.\n";
+                }
+                break;
+            }       
+            case 4:
+            {
+                cout<<"Unregistering Stock"<<endl;
+                int stockId;
+                cout << "Enter Stock ID to unregister: ";
+                cin>>stockId;
+
+                if(Broker_1.unregisterStock(stockId)) 
+                {
+                    cout << "Stock unregistered successfully.\n";
+                } 
+                else 
+                {
+                    cout<<"Failed to unregister stock. Stock ID may not exist.\n";
+                }
+                break;
+            }
+            case 5:
+            {
+                cout<<"Buying Stock"<<endl;
+                Broker_1.display_all_stock();
+
+                int stockid,userid,quantity;
+
+                cout<<"Enter UserID";
+                cin>>userid;
+                cout<<"Enter StockID";
+                cin>>stockid;
+                cout<<"Enter Quantity";
+                cin>>quantity;
+
+                Broker_1.buyStock(userid,stockid,quantity);
+                break;
+            }
+            case 6:
+            {
+                Broker_1.display_all_stock();
+                int stockid,userid,quantity;
+
+                cout<<"Enter UserID";
+                cin>>userid;
+                cout<<"Enter StockID";
+                cin>>stockid;
+                cout<<"Enter Quantity";
+                cin>>quantity;
+
+                Broker_1.sellStock(userid,stockid,quantity);
+                break;
+            }
+            
+        }
+    }
+
         //  UNREGISTER USER
             Broker_1.unregisterUser(2);
 
@@ -411,8 +568,6 @@ int main()
         //Display a particular user info
         Broker_1.display_particular_user(1);
 
-
-        //Balance notification      
 
 
 

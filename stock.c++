@@ -519,6 +519,20 @@ int main()
                 Broker_1.sellStock(userid,stockid,quantity);
                 break;
             }
+            case 7:
+            {
+                int stockid,nprice,quantity;
+                cout<<"Enter StockID";
+                cin>>stockid;
+                cout<<"Enter new Stock Price";
+                cin>>nprice;
+                cout<<"Enter new Stock Quantity";
+                cin>>quantity;
+
+
+                Broker_1.update_stock_price(stockid,nprice,quantity);
+                cout<<"updated Stock price";
+            }
             
         }
     }

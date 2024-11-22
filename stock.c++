@@ -1,14 +1,15 @@
 #include<bits/stdc++.h>
 #include<optional>
 using namespace std;
-enum class UserCategory
+enum class UserCategory   // created a user define data type that can take only limited values
 {
     INDIVIDUAL,
     INSTITUTION
 };
-class Transaction 
+class Transaction   // created a class to represent a single transaction.
 {
     public:  
+        // store stockid , whether it is sell or purchase , no of stocks user has purchased or sold , price of stock , brokerage charge of that transaction  
         int stockId;         
         bool isBuy;             
         double quantity;        
@@ -27,22 +28,22 @@ class Transaction
 class User 
 {
     private:
-        int userId;
-        string username;
-        double balance;
+        int userId;   // so that we can uniquely identify data 
+        string username;  
+        double balance;  
     public:
         UserCategory usercat;
-        vector<Transaction> transactions;
-        map<int,double> Stock_holds;
+        vector<Transaction> transactions;  // we can store no of transactions performed by user
+        map<int,double> Stock_holds; // we can create a list of no of stocks purchased by user 
 
-        User()
+        User()  
         {
             userId = 0;
             username = "";
             usercat = UserCategory::INDIVIDUAL;
             balance = 0.0;
         }
-        User(int id,string name,UserCategory ucat, double bal)
+        User(int id,string name,UserCategory ucat, double bal)  // created a parametrized constructor to assign value to variables
         {
             userId = id;
             username = name;
@@ -50,6 +51,8 @@ class User
             balance = bal;
         }
 
+
+        // created some getter and setter
         string getName()
         {
             return username;
@@ -63,9 +66,11 @@ class User
             return usercat;
         }
 
+        
+        // created a deduct amount function so that at time of buy stock we ccan refer to this function for deducting amount
         bool deductAmount(double amount) 
         {
-            //balance notification
+            //i have created a balance notification , whenever the user holds balnce less than 100 then user will be notified
             if(amount <= 100)
             {
                 cout<<"DEAR USER YOUR BALANCE IS QUITE LOW PLEASE DEPOSIT"<<endl;
@@ -81,11 +86,11 @@ class User
                 return false;
             }
         }
-        void addAmount(double amount) 
+        void addAmount(double amount)        
         {  
             balance = balance + amount;
         }
-        bool updateStock_holds(int stockId, double quantity, bool isBuy) 
+        bool updateStock_holds(int stockId, double quantity, bool isBuy)  // if i am buying a stock or selling a stock i have to keep updating the stocks user is holding simultaneously 
         {
             if(isBuy) 
             {
@@ -102,24 +107,23 @@ class User
                 return false;  
             }
         }
-        void addTransaction(Transaction trans)
+        void addTransaction(Transaction trans) // storing a transaction into a vector of transactions 
         {
             transactions.push_back(trans);
         }
-        const vector<Transaction>& getTransactions() 
+        const vector<Transaction>& getTransactions()   //getter
         {   
             return transactions;
         }
         
-        
 };
-class Stock 
+class Stock        // class to represent a stock
 {
     private:
-        int stockId;
-        double price;
-        optional<double> brokerage;
-        int quantity;
+        int stockId; // uniquely identify stock
+        double price; // price of stock
+        optional<double> brokerage;  // brokerage charge associated per stock
+        int quantity;  // quantity of stock
 
     public:
         Stock()
@@ -129,14 +133,16 @@ class Stock
             brokerage = 0.0;
             quantity = 0;
         }
-        Stock(int id, double p,optional<double> broker,int qua)
+        Stock(int id, double p,optional<double> broker,int qua)  // created a parameterized constructor that initializes stock with variables
         {
             stockId = id;
             price = p;
-            brokerage = broker;
+            brokerage = broker; 
             quantity = qua;
         }
 
+
+        // getter and setter
         double getPrice()  
         {   
             return price; 
@@ -145,7 +151,6 @@ class Stock
         {
             price = np;
         }
-
         double getquantity()
         {
             return quantity;
@@ -154,14 +159,12 @@ class Stock
         {
             quantity = a; 
         }
-
-        double getbrokerage(double d=1.0)
+        double getbrokerage(double d=1.0)  // we are geeting brokerage and if the brokerage value is null we assign 1% as brokerage value;
         {
             return brokerage.value_or(d);;
         }
 
-
-        bool deductstock(int preq)
+        bool deductstock(int preq) // whenever i buy a stock i have to use this function to deduct the no of stocks present
         {
             if(quantity >= preq)
             {
@@ -173,66 +176,71 @@ class Stock
                 return false;
             }
         }
-        void addstock(int qa)
+        void addstock(int qa) // whenever i sell a stock i use this function to add no of stocks present 
         {
             quantity = quantity + qa;
         }
         
 };
-class StockBroker 
-{
+class StockBroker  // this is the main class that handles all the fucntions 
+{ 
     private:
-        double broker_rate = 1.0;
-        map<int, User> users;  
-        map<int, Stock> stocks; 
+        map<int, User> users;   // it stores all the users 
+        map<int, Stock> stocks; // it stores all the stocks
 
     public:
-        bool registerUser(int userId,string name, UserCategory type, double balance = 0.0) 
+        bool registerUser(int userId,string name, UserCategory type, double balance = 0.0) // creating a new user 
         {
-            if(users.find(userId) != users.end()) 
+            if(users.find(userId) != users.end())  // finding user in the list of users if already present returning false;
                 return false;
             else
             {
-                users[userId] = User(userId,name,type,balance);
+                users[userId] = User(userId,name,type,balance);  // storing a new user in the list of users , with primary key of userid
                 return true; 
             }
         }
-        bool unregisterUser(int userId) 
+        bool unregisterUser(int userId)  // deleting a user from the list of users
         {
             return users.erase(userId); 
         }
-        bool registerStock(int stockId, double price,optional<double> brok,int quan) 
+        bool registerStock(int stockId, double price,optional<double> brok,int quan) // creating a new stock
         {
-            if(stocks.find(stockId) != stocks.end())
+            if(stocks.find(stockId) != stocks.end())  // finding stock int the list of stocks  if it's already there return false
             {
                 return false;
             }
             else
             {
-                stocks[stockId] = Stock(stockId, price,brok,quan);
+                stocks[stockId] = Stock(stockId, price,brok,quan); // storing a new stock in the list of stocks , with primary key as stockid
                 return true;
             }
         }
-        bool unregisterStock(int stockId) 
+        bool unregisterStock(int stockId) // deleting a stock from the list of stocks
         {
             return stocks.erase(stockId);
         }
-        bool buyStock(int userId, int stockId, double quantity) 
+        bool buyStock(int userId, int stockId, double quantity) // For buying a stock
         {
-            if(users.find(userId) == users.end() || stocks.find(stockId) == stocks.end() || quantity <= 0) 
+            // i have made certian base condition 1 . if userid is not present
+            //                                    2.  if stockid is not present
+            //                                    3.  if quantity is less than or equal to zero
+            if(users.find(userId) == users.end() || stocks.find(stockId) == stocks.end() || quantity <= 0)  
                 return false; 
 
-            User& uobj = users[userId];      
-            Stock& sobj = stocks[stockId];  
+            User& uobj = users[userId];        // creating a object of user
+            Stock& sobj = stocks[stockId];     // creating a object of stock
             
-            double totalCost = sobj.getPrice() * quantity;
-            double brokerage = (totalCost * sobj.getbrokerage()) / 100.0;
-            double totalAmount = totalCost + brokerage;
+            double totalCost = sobj.getPrice() * quantity;    // calculating a cost my multiplying stock price and quantity demanded by user      
+            double brokerage = (totalCost * sobj.getbrokerage()) / 100.0;  // calculating brokerge charge
+            double totalAmount = totalCost + brokerage; 
+
+            // deductstock - basically it checks whether the stocks are available or not , if yes then it will also deduct the quantity
+            // deductamount - basically it checks whether the user is having the balance to buy the stock or not , if yes the totalamount of stocks with brokerage will be deducted 
 
             if(sobj.deductstock(quantity) && uobj.deductAmount(totalAmount)) 
             {
-                uobj.updateStock_holds(stockId, quantity, true);
-                uobj.addTransaction(Transaction(stockId, true, quantity, sobj.getPrice(), brokerage));
+                uobj.updateStock_holds(stockId, quantity, true);  // updating the list of stocks the user is holding
+                uobj.addTransaction(Transaction(stockId, true, quantity, sobj.getPrice(), brokerage));  // adding transactions to vector per user
                 cout<<"PURCHASING STOCK IS SUCCESSFUL"<<endl;
                 cout << "Transaction successful , Total cost: " << totalAmount << endl;
                 return true;
@@ -241,18 +249,24 @@ class StockBroker
         }
         bool sellStock(int userId, int stockId, double quantity) 
         {
+            // i have made certian base condition 1 . if userid is not present
+            //                                    2.  if stockid is not present
+            //                                    3.  if quantity is less than or equal to zero
             if (users.find(userId) == users.end() || stocks.find(stockId) == stocks.end() || quantity <= 0)
-            return false;
+                return false;
 
-            User& uobj = users[userId];
-            Stock& sobj = stocks[stockId];
+            User& uobj = users[userId];             // creating a object of user
+            Stock& sobj = stocks[stockId];          // creating a object of stock
 
             if (uobj.updateStock_holds(stockId, quantity, false)) 
             {
-                double totalIncome = sobj.getPrice() * quantity;
-                double brokerage = (totalIncome * sobj.getbrokerage()) / 100.0;
+                double totalIncome = sobj.getPrice() * quantity;   // calculating a cost my multiplying stock price and quantity demanded by user 
+                double brokerage = (totalIncome * sobj.getbrokerage()) / 100.0;  // calculating brokerage
                 double netIncome = totalIncome - brokerage;
 
+                // addstock - basically it add the quantity of stocks
+                // addamount - basically it add the amount to the user account
+                // addTran - it is used to add transactions to vector per user
                 sobj.addstock(quantity);
                 uobj.addAmount(netIncome);
                 uobj.addTransaction(Transaction(stockId, false, quantity,sobj.getPrice(), brokerage));
@@ -264,19 +278,18 @@ class StockBroker
         }
         void update_stock_price(int stockId,int new_price,int new_quantity)
         {
-            Stock& sobj = stocks[stockId];
-
+            Stock& sobj = stocks[stockId];   
+            // updating stock price by setter
             sobj.setPrice(new_price);
             sobj.setquantity(new_quantity);
         }
         double balanceleft(int userId)
         {
-            if(users.find(userId) == users.end()) return 0.0; 
-
-            return users[userId].getBalance();
+            return users[userId].getBalance(); // it is used to get the remaining balance 
         }
         double getBrokerageCharges(int userId) 
         {   
+            // it is used to the get the brokerage charge given by user till now
             double total = 0.0;
             for (const auto& trans : users[userId].getTransactions()) 
             {
@@ -286,6 +299,7 @@ class StockBroker
         }
         void Display_stock_holds(int userId)
         {
+            // it is used to display the stocks the user is holding
             cout<<"STOCKS THE USER IS HOLDING"<<endl;
             for(const auto& i:users[userId].Stock_holds)
             {
@@ -294,21 +308,22 @@ class StockBroker
         }
         void Transaction_history_retrieval(int userId)
         {
+            // it is used to print all the transactions done by user whether it is buy or sell
             cout<<"TRANSACTIONS DONE TILL NOW"<<endl<<endl;
             for(const auto& transaction : users[userId].getTransactions())
-            {
-                
-                cout << "Stock ID :" << transaction.stockId << endl;
-                cout << "Transaction Type : " << (transaction.isBuy ? "Buy" : "Sell") << endl;
-                cout << "Quantity : " << transaction.quantity << endl;
-                cout << "Price : " << transaction.price << endl;
-                cout << "Broker Charge : " << transaction.brokerCharge << endl;
+            {       
+                cout<<"Stock ID:"<<transaction.stockId<<endl;
+                cout<<"Transaction Type:"<<(transaction.isBuy ? "Buy" : "Sell")<<endl;
+                cout<<"Quantity:"<<transaction.quantity<<endl;
+                cout<<"Price:"<<transaction.price<<endl;
+                cout<<"Broker Charge:"<<transaction.brokerCharge<<endl;
                 cout<<endl<<endl;
             }
 
         }
         void display_all_stock()
         {
+            // it is used to display all the stocks in which user can invest 
             for(auto i:stocks)
             {
                 cout<<"Stock No = "<<i.first<<" , Price - "<<i.second.getPrice()<<" ,Quantity = "<<i.second.getquantity()<<endl;
@@ -317,6 +332,7 @@ class StockBroker
 
         void display_all_user()
         {
+            // it is used to display all the registered users
             for(auto i:users)
             {
                 cout<<"User No = "<<i.first<<" , User Name ="<<i.second.getName()<<" , User Balance = "<<i.second.getBalance()<<endl;
@@ -325,9 +341,10 @@ class StockBroker
 
         void display_particular_stock(int stockId)
         {
-            if (stocks.find(stockId) == stocks.end()) 
+            // it is used to display the particular stock details
+            if (stocks.find(stockId) == stocks.end()) // if stock is not present it will return  
             {
-                cout << "Stock ID " << stockId << " not found." << endl;
+                cout<<"Stock ID "<<stockId<<" not found."<<endl;
                 return;
             }
 
@@ -337,9 +354,10 @@ class StockBroker
 
         void display_particular_user(int userId)
         {
-            if(users.find(userId) == users.end()) 
+            // it is used to display particular user details
+            if(users.find(userId) == users.end()) // if user is not present it will return 
             {
-                cout << "User ID " << userId << " not found." << endl;
+                cout<<"User ID "<<userId<<" not found."<<endl;
                 return;
             }
 
@@ -352,9 +370,9 @@ int main()
 {
     StockBroker Broker_1;
     
-    // Must have Functionalities 
+    //  I have already registered some stocks and users  
 
-        // REGISTER USER
+        // REGISTER USER 
             Broker_1.registerUser(1,"Akshit",UserCategory::INDIVIDUAL,10000.0);
             Broker_1.registerUser(2,"Pratham",UserCategory::INDIVIDUAL,10000.0);
             Broker_1.registerUser(3,"Nishkarsh",UserCategory::INDIVIDUAL,10000.0);
@@ -365,6 +383,8 @@ int main()
             Broker_1.registerStock(102,200.0,1,70);
             Broker_1.registerStock(103,1000.0,5,30);
             Broker_1.registerStock(104,400.0,2,100);
+
+            // I have created user input based program 
 
             while (true) 
             {
@@ -399,7 +419,7 @@ int main()
                         cin>>userid;
 
                         string uname;
-                        cout<<"Enter Username:";
+                        cout<<"Enter Firstname:";
                         cin>>uname;
 
                         int category;
@@ -615,55 +635,6 @@ int main()
                     }
                 }
             }
-
-
-        //  UNREGISTER USER
-            Broker_1.unregisterUser(2);
-
-        //  UNREGISTER STOCK
-            Broker_1.unregisterStock(103);
-            
-        //  BUY STOCK
-            Broker_1.buyStock(1,101,8);
-            Broker_1.buyStock(1,102,10);
-            Broker_1.buyStock(1,104,2);
-
-        // SELL STOCK
-            Broker_1.sellStock(1, 101, 5);
-        
-        //  STOCK UPHOLDS
-            cout<<endl;
-            Broker_1.Display_stock_holds(1);
-
-
-        // NICE TO HAVE FUNCTIONALITIES
-    
-        // Transaction History Retrieval
-        Broker_1.Transaction_history_retrieval(1);
-
-        // Balance Inquiry
-        Broker_1.balanceleft(1);
-
-        // Brokerage charge
-        cout<<Broker_1.getBrokerageCharges(1);
-
-        
-        //display all stock
-        Broker_1.display_all_stock();
-
-
-        //display all users
-        Broker_1.display_all_user();
-
-
-        // Display a particular Stock info
-        Broker_1.display_particular_stock(101);
-
-        //Display a particular user info
-        Broker_1.display_particular_user(1);
-
-
-
 
     return 0;
 }

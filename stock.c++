@@ -38,8 +38,8 @@ class User : public Stock_observer
         int userId;   // so that we can uniquely identify data 
         string username;  
         double balance;  
-    public:
         UserCategory usercat;
+    public:
         vector<Transaction> transactions;  // we can store no of transactions performed by user
         map<int,double> Stock_holds; // we can create a list of no of stocks purchased by user 
 
@@ -136,11 +136,11 @@ class User : public Stock_observer
         }
 
 
-        void addTransaction(Transaction trans) // storing a transaction into a vector of transactions 
+        void addTransaction(const Transaction &trans) // storing a transaction into a vector of transactions 
         {
             transactions.push_back(trans);
         }
-        const vector<Transaction>& getTransactions()   //getter
+        const vector<Transaction> getTransactions()   //getter
         {   
             return transactions;
         }
@@ -203,7 +203,7 @@ class Stock : public stock_subject       // class to represent a stock
         }
         double getbrokerage(double d=1.0)  // we are geeting brokerage and if the brokerage value is null we assign 1% as brokerage value;
         {
-            return brokerage.value_or(d);;
+            return brokerage.value_or(d);
         }
 
         bool deductstock(int preq) // whenever i buy a stock i have to use this function to deduct the no of stocks present
@@ -455,7 +455,7 @@ class StockBroker  // this is the main class that handles all the fucntions
             }
 
             User& user = users[userId];
-            cout<<"User ID: "<<userId<< ", Name: "<<user.getName()<<", Balance: "<<user.getBalance()<<", User Category: "<<(user.getUserCategory() == UserCategory::INDIVIDUAL ? "INDIVIDUAL" : "INSTITUTION")<<" ,User Balance = "<<user.getBalance()<<endl; 
+            cout<<"User ID: "<<userId<< ", Name: "<<user.getName()<<", Balance: "<<user.getBalance()<<", User Category: "<<(user.getUserCategory() == UserCategory::INDIVIDUAL ? "INDIVIDUAL" : "INSTITUTIONAL")<<" , User Balance = "<<user.getBalance()<<endl; 
         }   
 
 };
@@ -490,12 +490,14 @@ int main()
                 cout<<"5.Buy Stock"<<endl;
                 cout<<"6.Sell Stock"<<endl;
                 cout<<"7.Update Stock"<<endl;
-                cout<<"8.Transaction History of a particular User"<<endl;
-                cout<<"9.Remaining Balance of a particular User"<<endl;
-                cout<<"10.Total Brokerage Charges given by a particular User"<<endl;
-                cout<<"11.Display All Stocks Listed"<<endl;
-                cout<<"12.Display All Users Listed"<<endl;
-                cout<<"13.Exit"<<endl;
+                cout<<"8.Transaction history of a particular user"<<endl;
+                cout<<"9.Remaining balance of a particular user"<<endl;
+                cout<<"10.Total Brokerage charges given by a particular user"<<endl;
+                cout<<"11.Display all Stocks Listed"<<endl;
+                cout<<"12.Display all Users Listed"<<endl;
+                cout<<"13.Display a particular stock"<<endl;
+                cout<<"14.Display a particular user"<<endl;
+                cout<<"15.Exit"<<endl;
 
                 int ch;
                 cout<<"Enter a No to choose: ";
@@ -715,6 +717,22 @@ int main()
                         break;
                     }
                     case 13:
+                    {
+                        int sid;
+                        cout<<"Enter stock id";
+                        cin>>sid;
+                        Broker_1.display_particular_stock(sid);
+                        break;
+                    }
+                    case 14:
+                    {
+                        int uid;
+                        cout<<"Enter user id";
+                        cin>>uid;
+                        Broker_1.display_particular_user(uid);
+                        break;
+                    }
+                    case 15:
                     {
                         cout<<"Thank You"<<endl;
                         return 0;

@@ -23,6 +23,7 @@ I am dividing the functionalities into two types :
 - **Sell Stock:** : It allows users to sell stocks with the help of broker, ensuring they have sufficient stock to sell and updating their balance accordingly.
   - Adds amount
   - Updates stocks the user is holding
+- **Update Stock:** It is used to update the Stock Price
 
 ### Nice-to-have Functionalities
 - **Transaction History Retrieval:** Stores each user’s transactions, whether buying or selling.

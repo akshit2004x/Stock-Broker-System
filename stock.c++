@@ -26,10 +26,11 @@ class Transaction   // created a class to represent a single transaction.
         }
 };
 
-class Stock_observer
+class Stock_observer   
 {
+    // create a stock_observer class that will notify users when price changes
     public :
-        virtual void update_stock_Price(int sid,double oprice,double nprice) = 0;
+        virtual void update_stock_Price(int sid,double oprice,double nprice) = 0;   // i am implementing a pure virtual function , so that i have to define it later in derived class 
 };
 
 class User : public Stock_observer
@@ -151,9 +152,9 @@ class User : public Stock_observer
 class stock_subject
 {
     public:
-        virtual void add_stock_user(int id,int quan,User& u) = 0;
-        virtual void erase_stock_user(int id,int quan) = 0;
-        virtual void notify_user(double oprice, double nprice) = 0;
+        virtual void add_stock_user(int id,int quan,User& u) = 0; // if a new user buys stocks it should be added in stock users
+        virtual void erase_stock_user(int id,int quan) = 0; // if someone sells stocks its quantity should be reduced 
+        virtual void notify_user(double oprice, double nprice) = 0; // send notification to all users
 };
 
 class Stock : public stock_subject       // class to represent a stock
@@ -225,7 +226,9 @@ class Stock : public stock_subject       // class to represent a stock
 
         void add_stock_user(int userid, int quan,User& uobj) override 
         {
+            // i will first find the userid in the pair 
             auto i = find_if(stock_users.begin(), stock_users.end(),[userid](const pair<int,int>& user) { return user.first == userid; });
+            // if i found the user not registerd with that stock then i will create a pair and push otherwise i will just increase the quantity
             if(i==stock_users.end()) 
             {
                 stock_users.push_back({userid, quan});
@@ -239,9 +242,12 @@ class Stock : public stock_subject       // class to represent a stock
 
         void erase_stock_user(int userid,int quan) override 
         {
+            // i will first find the userid in the pair 
             auto i = find_if(stock_users.begin(), stock_users.end(),[userid](const pair<int, int>& user) { return user.first == userid; });
+            // if i found the userid then only i will perform
             if(i != stock_users.end()) 
             {
+                // if my quantity of stock becomes 0 then i will erase otherwise i will just decrease the quantity
                 int q = i->second;
                 if(q - quan == 0)
                 {
@@ -255,9 +261,10 @@ class Stock : public stock_subject       // class to represent a stock
                 
             }
         }   
-        
+
         void  notify_user(double oprice, double nprice) override 
         {
+            // i will notify all the users who are associated withthat stock
             for(auto i : stock_users) 
             {
                 int userid = i.first;
@@ -329,7 +336,7 @@ class StockBroker  // this is the main class that handles all the fucntions
             {
                 uobj.updateStock_holds(stockId, quantity, true);  // updating the list of stocks the user is holding
                 uobj.addTransaction(Transaction(stockId, true, quantity, sobj.getPrice(), brokerage));  // adding transactions to vector per user
-                sobj.add_stock_user(userId,quantity,uobj);
+                sobj.add_stock_user(userId,quantity,uobj);  // update the list of users who are holding that stock
                 cout<<"PURCHASING STOCK IS SUCCESSFUL"<<endl;
                 cout << "Transaction successful , Total cost: " << totalAmount << endl;
                 return true;
@@ -356,6 +363,7 @@ class StockBroker  // this is the main class that handles all the fucntions
                 // addstock - basically it add the quantity of stocks
                 // addamount - basically it add the amount to the user account
                 // addTran - it is used to add transactions to vector per user
+                // eraseTran - it is used to erase or decrease the quantity of stocks from list of user who are holding that stock 
                 sobj.addstock(quantity);
                 uobj.addAmount(netIncome);
                 uobj.addTransaction(Transaction(stockId, false, quantity,sobj.getPrice(), brokerage));
@@ -369,10 +377,12 @@ class StockBroker  // this is the main class that handles all the fucntions
         void update_stock_price(int stockId,int new_price)
         {
             Stock& sobj = stocks[stockId];   
-            // updating stock price by setter
             double ab = sobj.getPrice();
+            // storing the old price in a variable
             sobj.setPrice(new_price);
+            // updating stock price by setter
             sobj.notify_user(ab, new_price);
+            // notify the users who are wholding these stocks
 
             cout<<endl<<"UPDATION IS SUCCESSFULL"<<endl;
         }

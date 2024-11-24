@@ -255,8 +255,8 @@ class Stock : public stock_subject       // class to represent a stock
                 
             }
         }   
-
-        void notify_user(double oprice, double nprice) override 
+        
+        void  notify_user(double oprice, double nprice) override 
         {
             for(auto i : stock_users) 
             {

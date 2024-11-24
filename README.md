@@ -35,7 +35,7 @@ I am dividing the functionalities into two types :
 
 ## 2.Flowchart
 
-![Flowchart](FlowChart.jpg)
+![Flowchart](Flowchart_!.jpg)
 
 ## 3.How do the User,Stock,Transaction and StockBroker classes interact with each other in the stock brokerage system ?
 - Basically , The StockBroker class acts as the main controller

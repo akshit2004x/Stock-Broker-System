@@ -25,7 +25,14 @@ class Transaction   // created a class to represent a single transaction.
             brokerCharge = charge;
         }
 };
-class User 
+
+class Stock_observer
+{
+    public :
+        virtual void update_stock_Price(int sid,double oprice,double nprice) = 0;
+};
+
+class User : public Stock_observer
 {
     private:
         int userId;   // so that we can uniquely identify data 
@@ -104,9 +111,31 @@ class User
                     Stock_holds[stockId] = Stock_holds[stockId] - quantity;  
                     return true;
                 }
-                return false;  
             }
+            return false;
         }
+
+        void update_stock_Price(int sid,double oprice,double nprice) override
+        {
+            // i am sending notification to the user that the particular stock price is changed
+            if(Stock_holds.find(sid)!=Stock_holds.end()  && Stock_holds[sid] >=0 )
+            {
+
+                double shares = Stock_holds[sid];
+                double total = nprice * shares;
+
+                cout<<endl<<endl;
+                cout<<"Notification"<<endl; 
+                cout<<"stock updated for user id = "<<userId<<" username = "<<username<<endl;
+                cout<<"Price Changes from "<<oprice<<" this to "<<nprice<<endl;
+                cout<<"No of shares user is holding is "<<shares<<endl;
+                cout<<"Total Previous charge is "<<oprice*shares<<endl; 
+                cout<<"Total value is now "<<total<<endl<<endl;
+
+            } 
+        }
+
+
         void addTransaction(Transaction trans) // storing a transaction into a vector of transactions 
         {
             transactions.push_back(trans);
@@ -115,15 +144,28 @@ class User
         {   
             return transactions;
         }
+
         
 };
-class Stock        // class to represent a stock
+
+class stock_subject
+{
+    public:
+        virtual void add_stock_user(int id,int quan,User& u) = 0;
+        virtual void erase_stock_user(int id,int quan) = 0;
+        virtual void notify_user(double oprice, double nprice) = 0;
+};
+
+class Stock : public stock_subject       // class to represent a stock
 {
     private:
         int stockId; // uniquely identify stock
         double price; // price of stock
         optional<double> brokerage;  // brokerage charge associated per stock
         int quantity;  // quantity of stock
+
+        vector<pair<int,int>> stock_users; // pair -> user id , pair - > quantity user is holding
+        map<int,User> users;
 
     public:
         Stock()
@@ -179,6 +221,52 @@ class Stock        // class to represent a stock
         void addstock(int qa) // whenever i sell a stock i use this function to add no of stocks present 
         {
             quantity = quantity + qa;
+        }
+
+        void add_stock_user(int userid, int quan,User& uobj) override 
+        {
+            auto i = find_if(stock_users.begin(), stock_users.end(),[userid](const pair<int,int>& user) { return user.first == userid; });
+            if(i==stock_users.end()) 
+            {
+                stock_users.push_back({userid, quan});
+                users[userid] = uobj;
+            }
+            else
+            {
+                i->second = i->second + quan; 
+            }
+        }
+
+        void erase_stock_user(int userid,int quan) override 
+        {
+            auto i = find_if(stock_users.begin(), stock_users.end(),[userid](const pair<int, int>& user) { return user.first == userid; });
+            if(i != stock_users.end()) 
+            {
+                int q = i->second;
+                if(q - quan == 0)
+                {
+                    stock_users.erase(i);
+                    users.erase(userid);
+                }
+                else
+                {
+                    i->second = q - quan;  
+                }
+                
+            }
+        }   
+
+        void notify_user(double oprice, double nprice) override 
+        {
+            for(auto i : stock_users) 
+            {
+                int userid = i.first;
+                if(users.find(userid) != users.end())
+                {
+                    User& uobj = users[userid];
+                    uobj.update_stock_Price(stockId,oprice,nprice);
+                }
+            }
         }
         
 };
@@ -241,6 +329,7 @@ class StockBroker  // this is the main class that handles all the fucntions
             {
                 uobj.updateStock_holds(stockId, quantity, true);  // updating the list of stocks the user is holding
                 uobj.addTransaction(Transaction(stockId, true, quantity, sobj.getPrice(), brokerage));  // adding transactions to vector per user
+                sobj.add_stock_user(userId,quantity,uobj);
                 cout<<"PURCHASING STOCK IS SUCCESSFUL"<<endl;
                 cout << "Transaction successful , Total cost: " << totalAmount << endl;
                 return true;
@@ -270,18 +359,22 @@ class StockBroker  // this is the main class that handles all the fucntions
                 sobj.addstock(quantity);
                 uobj.addAmount(netIncome);
                 uobj.addTransaction(Transaction(stockId, false, quantity,sobj.getPrice(), brokerage));
+                sobj.erase_stock_user(userId,quantity);
                 cout<<"SELLING STOCK IS SUCCESSFUL"<<endl;
                 cout <<"Transaction successful , Net income: " << netIncome << endl;
                 return true;
             }
             return false;
         }
-        void update_stock_price(int stockId,int new_price,int new_quantity)
+        void update_stock_price(int stockId,int new_price)
         {
             Stock& sobj = stocks[stockId];   
             // updating stock price by setter
+            double ab = sobj.getPrice();
             sobj.setPrice(new_price);
-            sobj.setquantity(new_quantity);
+            sobj.notify_user(ab, new_price);
+
+            cout<<endl<<"UPDATION IS SUCCESSFULL"<<endl;
         }
         double balanceleft(int userId)
         {
@@ -568,10 +661,8 @@ int main()
                         cin>>stockid;
                         cout<<"Enter new Stock Price:";
                         cin>>nprice;
-                        cout<<"Enter new Stock Quantity:";
-                        cin>>quantity;
 
-                        Broker_1.update_stock_price(stockid, nprice, quantity);
+                        Broker_1.update_stock_price(stockid, nprice);
                 
                         break;
                     }

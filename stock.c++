@@ -472,6 +472,7 @@ class StockBroker  // this is the main class that handles all the fucntions
         }   
         void instituion_return(int userid)
         {
+            // this  function is for the users who are  institutional , there brokerage charges will be returned  
             int new_bal;
             int a = getBrokerageCharges(userid);
             int bal = balanceleft(userid);

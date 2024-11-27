@@ -32,6 +32,7 @@ I am dividing the functionalities into two types :
 - **Display Stock Information:** Provides users with stock details, including brokerage charges
 - **Display User Information:** Allows users to view their account information.
 - **Balance Notification:** Alerts users when their balance drops below a specified limit.
+- **No Brokerage charge for Institutional users:** The users which belong to institutional category there brokerage charges will be returned
 
 ## 2.Flowchart
 

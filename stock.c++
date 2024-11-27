@@ -4,7 +4,7 @@ using namespace std;
 enum class UserCategory   // created a user define data type that can take only limited values
 {
     INDIVIDUAL,
-    INSTITUTION
+    INSTITUTIONAL
 };
 class Transaction   // created a class to represent a single transaction.
 {
@@ -73,7 +73,10 @@ class User : public Stock_observer
         {
             return usercat;
         }
-
+        void setBalance(int b)
+        {
+            balance = b;
+        }
         
         // created a deduct amount function so that at time of buy stock we ccan refer to this function for deducting amount
         bool deductAmount(double amount) 
@@ -467,6 +470,25 @@ class StockBroker  // this is the main class that handles all the fucntions
             User& user = users[userId];
             cout<<"User ID: "<<userId<< ", Name: "<<user.getName()<<", Balance: "<<user.getBalance()<<", User Category: "<<(user.getUserCategory() == UserCategory::INDIVIDUAL ? "INDIVIDUAL" : "INSTITUTIONAL")<<" , User Balance = "<<user.getBalance()<<endl; 
         }   
+        void instituion_return(int userid)
+        {
+            int new_bal;
+            int a = getBrokerageCharges(userid);
+            int bal = balanceleft(userid);
+
+            User& uobj = users[userid];
+            if( uobj.getUserCategory() == UserCategory::INSTITUTIONAL)
+            {
+                cout<<"Current balance"<<bal<<endl;
+                uobj.setBalance(a+bal);  
+                cout<<"Current balance"<<balanceleft(userid)<<endl;
+                cout<<endl<<"Your Brokerage charges are returned"<<endl;   
+            }
+            else
+            {
+                cout<<"You are An individual , so your brokerage charges will not be returned"<<endl;
+            }
+        }
 
 };
 int main()
@@ -476,7 +498,7 @@ int main()
     //  I have already registered some stocks and users  
 
         // REGISTER USER 
-            Broker_1.registerUser(1,"Akshit",UserCategory::INDIVIDUAL,10000.0);
+            Broker_1.registerUser(1,"Akshit",UserCategory::INSTITUTIONAL,10000.0);
             Broker_1.registerUser(2,"Pratham",UserCategory::INDIVIDUAL,10000.0);
             Broker_1.registerUser(3,"Nishkarsh",UserCategory::INDIVIDUAL,10000.0);
             Broker_1.registerUser(4,"Shlok",UserCategory::INDIVIDUAL,10000.0);
@@ -507,7 +529,8 @@ int main()
                 cout<<"12.Display all Users Listed"<<endl;
                 cout<<"13.Display a particular stock"<<endl;
                 cout<<"14.Display a particular user"<<endl;
-                cout<<"15.Exit"<<endl;
+                cout<<"15.Get Brokerage Charges back"<<endl;
+                cout<<"16.Exit"<<endl;
 
                 int ch;
                 cout<<"Enter a No to choose: ";
@@ -535,7 +558,7 @@ int main()
                         cout<<"Enter Initial Balance:";
                         cin>>balance;
 
-                        UserCategory usercategory = (category == 1) ? UserCategory::INSTITUTION : UserCategory::INDIVIDUAL;
+                        UserCategory usercategory = (category == 1) ? UserCategory::INSTITUTIONAL : UserCategory::INDIVIDUAL;
 
                         if(Broker_1.registerUser(userid,uname,usercategory,balance)) 
                         {
@@ -743,6 +766,15 @@ int main()
                         break;
                     }
                     case 15:
+                    {
+                        int uid;
+                        cout<<"Enter user id";
+                        cin>>uid;
+                        Broker_1.instituion_return(uid);
+                        
+                        break;
+                    }
+                    case 16:
                     {
                         cout<<"Thank You"<<endl;
                         return 0;

@@ -25,7 +25,8 @@ class Transaction   // created a class to represent a single transaction.
             brokerCharge = charge;
         }
 };
-
+// I have applied a Observer ( behavioural ) DESIGN PATTERN 
+// whenever one object changes it notifies other objects associated with it 
 class Stock_observer   
 {
     // create a stock_observer class that will notify users when price changes
@@ -42,7 +43,7 @@ class User : public Stock_observer
         UserCategory usercat;
     public:
         vector<Transaction> transactions;  // we can store no of transactions performed by user
-        map<int,double> Stock_holds; // we can create a list of no of stocks purchased by user 
+        map<int,double> Stock_holds; // we can create a list of no of stocks purchased by user storing < stockID , quantity of stocks >
 
         User()  
         {
@@ -97,18 +98,18 @@ class User : public Stock_observer
                 return false;
             }
         }
-        void addAmount(double amount)        
+        void addAmount(double amount)  // creating a add amount function so that we can refer to later while selling stock       
         {  
             balance = balance + amount;
         }
         bool updateStock_holds(int stockId, double quantity, bool isBuy)  // if i am buying a stock or selling a stock i have to keep updating the stocks user is holding simultaneously 
         {
-            if(isBuy) 
+            if(isBuy) // if buying i will add
             {
                 Stock_holds[stockId] = Stock_holds[stockId] + quantity;  
                 return true;
             } 
-            else 
+            else // while selling i wil also check the quantity demanded is present or not and again in this function i will deduct only by crosschecking it
             {   
                 if(Stock_holds[stockId] >= quantity) 
                 {
@@ -121,7 +122,8 @@ class User : public Stock_observer
 
         void update_stock_Price(int sid,double oprice,double nprice) override
         {
-            // i am sending notification to the user that the particular stock price is changed
+            // i am sending notification to the user( stock owner ) that the particular stock price is changed
+            // the user should be aware whenever the stock price changes so that he can decide at what time he has to buy more or sell current 
             if(Stock_holds.find(sid)!=Stock_holds.end()  && Stock_holds[sid] >=0 )
             {
 
@@ -205,7 +207,7 @@ class Stock : public stock_subject       // class to represent a stock
         {
             quantity = a; 
         }
-        double getbrokerage(double d=1.0)  // we are geeting brokerage and if the brokerage value is null we assign 1% as brokerage value;
+        double getbrokerage(double d=1.0)  // we are getting brokerage and if the brokerage value is null we assign 1% as brokerage value;
         {
             return brokerage.value_or(d);
         }
@@ -231,9 +233,9 @@ class Stock : public stock_subject       // class to represent a stock
         {
             // i will first find the userid in the pair 
             auto i = find_if(stock_users.begin(), stock_users.end(),[userid](const pair<int,int>& user) { return user.first == userid; });
-            // if i found the user not registerd with that stock then i will create a pair and push otherwise i will just increase the quantity
             if(i==stock_users.end()) 
             {
+                // if i found the user not registerd with that stock then i will create a pair and push otherwise i will just increase the quantity
                 stock_users.push_back({userid, quan});
                 users[userid] = uobj;
             }
@@ -267,7 +269,7 @@ class Stock : public stock_subject       // class to represent a stock
 
         void  notify_user(double oprice, double nprice) override 
         {
-            // i will notify all the users who are associated withthat stock
+            // i will notify all the users who are associated with that stock
             for(auto i : stock_users) 
             {
                 int userid = i.first;

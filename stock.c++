@@ -33,7 +33,7 @@ class Stock_observer
     public :
         virtual void update_stock_Price(int sid,double oprice,double nprice) = 0;   // i am implementing a pure virtual function , so that i have to define it later in derived class 
 };
-
+// USERID - PRIMARY KEY , STOCK ID - PRIMARY KEY
 class User : public Stock_observer
 {
     private:
@@ -543,6 +543,7 @@ int main()
                 {
                     case 1:
                     {
+                        // For registering user we ask for userid , name , category and balance 
                         cout<<"Registering User"<<endl;
 
                         int userid;
@@ -561,6 +562,7 @@ int main()
                         cout<<"Enter Initial Balance:";
                         cin>>balance;
 
+
                         UserCategory usercategory = (category == 1) ? UserCategory::INSTITUTIONAL : UserCategory::INDIVIDUAL;
 
                         if(Broker_1.registerUser(userid,uname,usercategory,balance)) 
@@ -576,6 +578,7 @@ int main()
                     }
                     case 2:
                     {
+                        // For registering stock we ask for stockid , price , quantity and brokerage 
                         cout<<"Registering Stock"<<endl;
 
                         int stockid, quantity;
@@ -613,6 +616,7 @@ int main()
                     }
                     case 3:
                     {
+                        // For unregistering user we just need userid 
                         cout<<"Unregistering User"<<endl;
 
                         int userId;
@@ -633,6 +637,7 @@ int main()
                     }       
                     case 4:
                     {
+                        // For unregistering stock we just need stockid
                         cout<< "Unregistering Stock"<<endl;
 
                         int stockId;
@@ -652,7 +657,7 @@ int main()
                     }
                     case 5:
                     {
-
+                        // For buying stock first we will display all the stocks then , i will ask the broker userid , stockid and the quantity. 
                         cout<<"Displaying Stocks"<<endl;
                         Broker_1.display_all_stock();
                         cout<<endl<<"Buying Stock"<<endl;
@@ -672,6 +677,7 @@ int main()
                     }
                     case 6:
                     {
+                        // For Selling stock first we will display all the stocks then , i will ask the broker userid , stockid and the quantity. 
                         cout<<"Displaying Stocks"<<endl;
                         Broker_1.display_all_stock();
                         cout<<endl<<"Selling Stock"<<endl;
@@ -691,6 +697,7 @@ int main()
                     }
                     case 7:
                     {
+                        // For updating the stock we need stockid and the new stock price
                         cout<<"Update Stock"<<endl;
 
                         int stockid,nprice,quantity;
@@ -706,6 +713,7 @@ int main()
                     }
                     case 8:
                     {
+                        // For Viewing Transactions done till now for a particular user , we need userid 
                         cout<<"Transaction history retrieval"<<endl;
 
                         int userid;
@@ -718,6 +726,7 @@ int main()
                     }
                     case 9:
                     {
+                        // For Viewing remaining balance of a user we need user id
                         cout<<"Remaining Balance of a particular User"<<endl;
 
                         int userid;
@@ -730,6 +739,7 @@ int main()
                     }
                     case 10:
                     {
+                        // For Viewing total brokerage charges , you just have have to enter userid
                         cout<<"Total Brokerage Charge"<<endl;
 
                         int userid;
@@ -742,18 +752,21 @@ int main()
                     }
                     case 11:
                     {
+                        // It will Display all the stocks present
                         cout<<"Display All Stocks Listed"<<endl;
                         Broker_1.display_all_stock();
                         break;
                     }
                     case 12:
                     {
+                        // It will Display all the users present
                         cout<<"Display All Users Listed"<<endl;
                         Broker_1.display_all_user();
                         break;
                     }
                     case 13:
                     {
+                        // It will Display details of particular stock , with the help of stock id it will search
                         int sid;
                         cout<<"Enter stock id";
                         cin>>sid;
@@ -762,6 +775,7 @@ int main()
                     }
                     case 14:
                     {
+                        // It will Display details of particular user , with the help of user id it will search
                         int uid;
                         cout<<"Enter user id";
                         cin>>uid;
@@ -770,6 +784,7 @@ int main()
                     }
                     case 15:
                     {
+                        // In this the Institutional user will ask for return of brokerage charges  
                         int uid;
                         cout<<"Enter user id";
                         cin>>uid;
